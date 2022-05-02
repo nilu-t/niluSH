@@ -49,8 +49,7 @@ void touch(char *fileName){
 }
 
 /**
-Helper ls function implementation in C.
-ls command from the Bash programming language lists all the files and directories in the current working directory.
+ * @brief Helper ls function implementation in C. ls command from the Bash programming language lists all the files and directories in the current working directory.
  */
 void ls(){
     
@@ -77,9 +76,8 @@ void ls(){
 }
 
 /**
-ls overloaded function implementation in C. Parameter is a directory path.
-ls command from the Bash programming language lists all the files and directories in the current working directory.
-*/
+ * @brief ls overloaded function implementation in C. Parameter is a directory path. ls command from the Bash programming language lists all the files and directories in the current working directory.
+ */
 void lsOverloaded(char *dPath){
     
     //checking if directory path given is absolute or relative which will contain the "/" (forward-slash) symbol.
@@ -99,7 +97,7 @@ void lsOverloaded(char *dPath){
             printf("ERROR: the %s directory is not valid\n", dPath);
         }
         else{
-            //printing the directories and files in the working directory.
+            //printing the directories and files in the working directory. The readdir function returns pointer to next directory entry.
             while( (sd=(readdir(dir))) != NULL ){
 
                 //if the directory entry starts with a '.' then it is a hidden file which ls does not print.
@@ -113,9 +111,8 @@ void lsOverloaded(char *dPath){
 }
 
 /**
- * pwd function implementation in C.
- * pwd command from the Bash programming language prints the current working directory.
-*/
+ * @brief pwd function implementation in C. pwd command from the Bash programming language prints the current working directory.
+ */
 void pwd(){
     char buffer[1000];
     getcwd(buffer, 1000);
@@ -135,9 +132,9 @@ void cd(){
 }
 
 /**
-overloaded cd function implementation in C. Parameter is a directory path.
-cd command from the Bash programming language changes the current working directory.
-*/
+ * @brief overloaded cd function implementation in C. Parameter is a directory path. cd command from the Bash programming language changes the current working directory.
+ * @param dPath which is the directory path to change directory to.
+ */
 void cdOverloaded(char *dPath){
     int success = chdir(dPath);
     if(success == -1 && dPath != NULL){
@@ -153,10 +150,28 @@ void cdOverloaded(char *dPath){
 }
 
 /**
+ * @brief env function implementation in C. env command from the Bash programming language prints all the environment variables.
+ */
+void env(char **envp){
+    char **temp;
+
+    for(temp = envp; *temp != NULL; temp++){
+        printf("%s\n", *temp);
+    }
+}
+
+/**
  * @brief The help command implementation in C.
  */
 void help(){
     printf("USAGE: TODO\n");
+}
+
+/**
+ * @brief pipes function implementation in C. The symbol "|" used for pipe from the Bash programming language used to take output from one process as input to another process.
+*/
+void pipes(){
+    
 }
 
 /**
@@ -209,76 +224,75 @@ int sizeOfBufferFgets(char *pointer){
 }
 
 /**
- * @brief pipes function implementation in C. The symbol "|" used for pipe from the Bash programming language used to take output from one process as input to another process.
-*/
-void pipes(){
-    
-}
-
-/**
  * @brief the loop for the shell.
  */
-void loop(){
+void loop(char **envp){
+
     char buffer[1000]; //assuming a buffer size of 1000. TODO: if for some reason the buffer size is not enough for user, then increase buffer size dynamically.
 
-    while(1){        
-        printf(">");
-        fgets(buffer, 100, stdin);
+    printf(">");
+    fgets(buffer, 100, stdin);
 
-        int size = sizeOfBufferFgets(buffer); //getting the size of the buffer.
-        buffer[size] = '\0'; //appending a null character which was originally a newline character by fgets.
+    int size = sizeOfBufferFgets(buffer); //getting the size of the buffer.
+    buffer[size] = '\0'; //appending a null character which was originally a newline character by fgets.
 
-        int indexArg2 = indexOfWhitespaceAt(1, buffer); //index at the first whitespace in the buffer.
-        char * argument2 = &buffer[indexArg2 + 1]; //argument 2 pointer which is right after the first whitespace 
+    int indexArg2 = indexOfWhitespaceAt(1, buffer); //index at the first whitespace in the buffer.
+    char * argument2 = &buffer[indexArg2 + 1]; //argument 2 pointer which is right after the first whitespace 
 
-        if(indexArg2 == 0){
-            //setting argument 2 to be null.
-            argument2 = NULL;
-        }
-        /*
-         * The cases for the different useful bash commands.
-         */
-        //ls command.
-        if(buffer[0] == 'l' && buffer[1] == 's'){
-            lsOverloaded(argument2);
-        }
-        //cd command.
-        else if(buffer[0] == 'c' && buffer[1] == 'd'){
-            cdOverloaded(argument2);
-        }
-        //pwd command.
-        else if(buffer[0] == 'p' && buffer[1] == 'w' && buffer[2] == 'd'){
-            pwd();
-        }
-        //echo command.
-        else if(buffer[0] == 'e' && buffer[1] == 'c' && buffer[2] == 'h' && buffer[3] == 'o'){
-            echo(argument2);
-        }
-        //touch command.
-        else if(buffer[0] == 't' && buffer[1] == 'o' && buffer[2] == 'u' && buffer[3] == 'c' && buffer[4] == 'h'){
-            touch(argument2);
-        }
-        //help command.
-        else if(buffer[0] == 'h' && buffer[1] == 'e' && buffer[2] == 'l' && buffer[3] == 'p'){
-            help();
-        }
-        loop(); //loop the program again.
+    if(indexArg2 == 0){
+        //setting argument 2 to be null.
+        argument2 = NULL;
     }
+    /*
+     * The cases for the different useful bash commands.
+     */
+    //1. ls command.
+    if(buffer[0] == 'l' && buffer[1] == 's'){
+        lsOverloaded(argument2);
+    }
+    //2. cd command.
+    else if(buffer[0] == 'c' && buffer[1] == 'd'){
+        cdOverloaded(argument2);
+    }
+    //3. pwd command.
+    else if(buffer[0] == 'p' && buffer[1] == 'w' && buffer[2] == 'd'){
+        pwd();
+    }
+    //4. echo command.
+    else if(buffer[0] == 'e' && buffer[1] == 'c' && buffer[2] == 'h' && buffer[3] == 'o'){
+        echo(argument2);
+    }
+    //5. touch command.
+    else if(buffer[0] == 't' && buffer[1] == 'o' && buffer[2] == 'u' && buffer[3] == 'c' && buffer[4] == 'h'){
+        touch(argument2);
+    }
+    //6. env command.
+    else if(buffer[0] == 'e' && buffer[1] == 'n' && buffer[2] == 'v'){
+        env(envp);
+    }
+    //7. help command.
+    else if(buffer[0] == 'h' && buffer[1] == 'e' && buffer[2] == 'l' && buffer[3] == 'p'){
+        help();
+    }
+
+    loop(envp); //loop the program again.
+    
 }
 
 /**
  * @brief main function of the program.
  * @param argc is the number of command line arguments.
  * @param argv is char** pointer which represents each command line argument.
+ * @param envp is the environment variables which are passed to the main.
  * @return int 
  */
-int main(int argc, char **argv){
+int main(int argc, char **argv, char **envp){
 
     printf("\nBash-in-C project by Nilushanth Thiruchelvam\n");
     printf("Enter a bash command.\n");
     
-    //executing the loop for the shell.
-    loop();
+    //executing the loop for the shell. Passing all the environment variables in the call.
+    loop(envp);
     
     return 0;
 }
