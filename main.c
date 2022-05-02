@@ -6,8 +6,8 @@
 /**
 -----------------------------------------------------------------------------------------------------------------
 * Description
-* My implementation of the Bash Shell written in C using POSIX C libraries.
-* Useful commands from the Bash programming language now rewritten in C.
+* niluSH (nilu shell) is a shell written in C using POSIX C libraries to mock useful commands from the Bash programming language.
+* With an extension of new commands which do not exist in Bash scripting.
 * No built-in shells are used. Only POSIX libraries for directory manipulation.
 * Author: Nilushanth Thiruchelvam.
 -----------------------------------------------------------------------------------------------------------------
@@ -106,18 +106,25 @@ void lsOverloaded(char *dPath){
                 }
             }
             closedir(dir); //close the opened directory.
+
+            free(dPath);
         }
     } 
 }
 
 /**
  * @brief pwd function implementation in C. pwd command from the Bash programming language prints the current working directory.
+ * @return the path of the current working directory.
  */
-void pwd(){
-    char buffer[1000];
-    getcwd(buffer, 1000);
+char * pwd(){
+    char * buffer = NULL;
 
+    buffer = malloc(1000 * sizeof(char));
+    getcwd(buffer, 1000);
+        
     printf("current working directory: %s\n", buffer);
+
+    return buffer;
 }
  
 /**
@@ -128,7 +135,9 @@ void cd(){
     * getenv() standard library function is used to obtain the environment variable content of HOME.
     */
     chdir(getenv("HOME"));
-    pwd();
+    char *wd = pwd(); //printing the working directory to let the user know they changed directories.
+    free(wd); //freeing the wd pointer because the working directory had memory allocated with malloc.
+
 }
 
 /**
@@ -145,7 +154,10 @@ void cdOverloaded(char *dPath){
     }
     else{
         //print the working directory to let the user know they have been redirected.
-        pwd();
+        char *wd = pwd();
+        //freeing the wd pointer since malloc was used to create the working directory.
+        free(wd);
+
     }
 }
 
@@ -164,14 +176,24 @@ void env(char **envp){
  * @brief The help command implementation in C.
  */
 void help(){
-    printf("USAGE: TODO\n");
+    printf("niluSH by Nilushanth Thiruchelvam\n");
+    printf("USAGE: [command] [option] [word]\nor\nUSAGE: [command] [argument]\n");
 }
 
 /**
  * @brief pipes function implementation in C. The symbol "|" used for pipe from the Bash programming language used to take output from one process as input to another process.
-*/
+ */
 void pipes(){
     
+}
+
+/**
+ * @brief Only found in niluSH. Saves all contents in working directory to a different directory called niluSH-backup.
+ */
+void backup(){
+    char * wd = pwd();
+    free(wd); //freeing the wd pointer because the working directory had memory allocated with malloc.
+    printf("Backup made in %s named \"niluSH-backup\"\n", pwd()); 
 }
 
 /**
@@ -244,7 +266,7 @@ void loop(char **envp){
         argument2 = NULL;
     }
     /*
-     * The cases for the different useful bash commands.
+     * The cases for the different useful re-implmentation of bash commands and niluSH commands.
      */
     //1. ls command.
     if(buffer[0] == 'l' && buffer[1] == 's'){
@@ -256,7 +278,8 @@ void loop(char **envp){
     }
     //3. pwd command.
     else if(buffer[0] == 'p' && buffer[1] == 'w' && buffer[2] == 'd'){
-        pwd();
+        char *wd = pwd();
+        free(wd); //freeing the working directory pointer because the working directory had memory allocated with malloc.
     }
     //4. echo command.
     else if(buffer[0] == 'e' && buffer[1] == 'c' && buffer[2] == 'h' && buffer[3] == 'o'){
@@ -274,6 +297,10 @@ void loop(char **envp){
     else if(buffer[0] == 'h' && buffer[1] == 'e' && buffer[2] == 'l' && buffer[3] == 'p'){
         help();
     }
+    //8. backup command. (niluSH command)
+    else if(buffer[0] == 'b' && buffer[1] == 'a' && buffer[2] == 'c' && buffer[3] == 'k' && buffer[4] == 'u' && buffer[5] == 'p'){
+        backup();
+    }
 
     loop(envp); //loop the program again.
     
@@ -284,12 +311,12 @@ void loop(char **envp){
  * @param argc is the number of command line arguments.
  * @param argv is char** pointer which represents each command line argument.
  * @param envp is the environment variables which are passed to the main.
- * @return int 
+ * @return 0 for successful completion of the program. 
  */
 int main(int argc, char **argv, char **envp){
 
-    printf("\nBash-in-C project by Nilushanth Thiruchelvam\n");
-    printf("Enter a bash command.\n");
+    printf("\nniluSH\n");
+    printf("Type \"help\" for usage and list of available commands.\n");
     
     //executing the loop for the shell. Passing all the environment variables in the call.
     loop(envp);

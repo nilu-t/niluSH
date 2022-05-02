@@ -1,7 +1,4 @@
-# Bash-in-C
-My implementation of the Bash Shell written in C using POSIX C libraries.
-<br>
-Useful commands from the Bash programming language now rewritten in C.
-<br>
-No built-in shells are used. Only POSIX libraries for directory manipulation.
-<br>
+# niluSH (nilu shell)
+
+<b>What is niluSH ?</b>
+niluSH (nilu shell) is an implementation of the useful Bash Shell commands with an extension of new commands which do not exist in the Bash programming language. niluSH is written in C using POSIX C libraries without the use of any built-in shells.
